@@ -1,0 +1,118 @@
+﻿<!-- Объявления пространства имен XAML, подключение materialdesign и задание базовых свойств окна -->
+<Window x:Class="SearchForMatches.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SearchForMatches"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        mc:Ignorable="d"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        Background="{DynamicResource MaterialDesignPaper}"
+        ResizeMode="NoResize"
+        Title="SearchForMatchess" Height="450" Width="800">
+    <Window.Resources>
+        <!-- Подключение класса DataList, отвечающего за отображение результатов работы программы в главном окне -->
+        <local:DataList x:Key="SearchInfo" Path="Выберите директорию" FilesCount="0" MatchesCount="0" Current="Проверяемый файл" Progress="0" InFolder="0"/>
+    </Window.Resources>
+    <Grid>
+        <!-- Разбиение окна на 3 строки разной высоты -->
+        <Grid.RowDefinitions>
+            <RowDefinition Height="15*"></RowDefinition>
+            <RowDefinition Height="80*"></RowDefinition>
+            <RowDefinition Height="5*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <!-- Строка содержащая средства управления программой -->
+        <Grid Grid.Row="0" Background="#d1c4e9">
+            <DockPanel LastChildFill="True">
+                <!-- Кнопка выбора директории -->
+                <Button
+                    DockPanel.Dock="Left"
+                    Margin="10, 0,10,0"
+                    Height="40"
+                    VerticalContentAlignment="Center"
+                    Style="{StaticResource MaterialDesignRaisedButton}"
+                    Click="SelectFolder_Click">
+                    Выбрать директорию
+                </Button>
+                <!-- Кнопка запускающая поиск совпадений в документах -->
+                <Button
+                    DockPanel.Dock="Right"
+                    Margin="10, 0,10,0"
+                    Height="45"
+                    Width="45"
+                    Style="{StaticResource MaterialDesignFloatingActionAccentButton}"
+                    ToolTip="Искать совпадения"
+                    Click="FindMatches_Click">
+                    <materialDesign:PackIcon
+                    Kind="FileDocumentBoxSearchOutline"
+                    Height="24"
+                    Width="24" />
+                </Button>
+                <!-- Форма для ввода фразы -->
+                <TextBox
+                    Background="GhostWhite"
+                    x:Name="KeyWord"
+                    Style="{StaticResource MaterialDesignOutlinedTextFieldTextBox}"
+                    Margin="10, 0,10,0"
+                    VerticalAlignment="Center"
+                    Height="44"
+                    FontSize="14"
+                    AcceptsReturn="True"
+                    TextWrapping="Wrap"
+                    VerticalScrollBarVisibility="Auto"
+                    materialDesign:HintAssist.Hint="Введите ключевое слово или фразу"/>
+            </DockPanel>
+        </Grid>
+        <!-- Строка отображающая результат выполнения программы -->
+        <Grid Grid.Row="1" Background="#ede7f6">
+            <ListBox x:Name="MatchesList" Visibility="Hidden" SelectionChanged="MatchesList_SelectionChanged">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Margin="10 5 0 5" HorizontalAlignment="Stretch">
+                            <TextBlock FontSize="16" Text="{Binding Path=Title}" HorizontalAlignment="Left" />
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock FontSize="16" Text="Количество совпадений: " HorizontalAlignment="Left" />
+                                <TextBlock FontSize="16" Text="{Binding Path=Counter}" HorizontalAlignment="Left" />
+                            </StackPanel>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Grid>
+        <!-- Строка отображающая прогресс выполнения программы -->
+        <Grid Grid.Row="1" x:Name="ProgressGrid" DataContext="{StaticResource SearchInfo}" Visibility="Hidden">
+            <ProgressBar Width="500" Height="30" Minimum="0" Maximum="{Binding Maximum}" Value="{Binding Progress}" materialDesign:TransitionAssist.DisableTransitions="True"/>
+            <TextBlock Text="{Binding Current}" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="15" Foreground="AntiqueWhite"/>
+        </Grid>
+        <!-- Строка отображающая промежуточные результаты выполнения программы -->
+        <Grid Grid.Row="2" DataContext="{StaticResource SearchInfo}" Background="#d1c4e9">
+            <DockPanel VerticalAlignment="Center">
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                    <TextBlock Margin="5 0 5 0" Text="{Binding Path=Path}"/>
+                    <StackPanel Orientation="Horizontal" x:Name="CheckedInfo" Visibility="Hidden">
+                        <!-- Отображение количества файлов соответствующих критериям поиска -->
+                        <StackPanel Margin="5 0 5 0" Orientation="Horizontal">
+                            <TextBlock Text=" Количество соответствующих файлов: "/>
+                            <TextBlock Text="{Binding Path=FilesCount}"/>
+                        </StackPanel>
+                        <!-- Отображение количества совпадений в соответствующих файлах -->
+                        <StackPanel Margin="5 0 5 0" Orientation="Horizontal">
+                            <TextBlock Text=" Всего совпадений: "/>
+                            <TextBlock Text="{Binding Path=MatchesCount}"/>
+                        </StackPanel>
+                    </StackPanel>
+                </StackPanel>
+                <StackPanel DockPanel.Dock="Right" x:Name="ProgressInfo" Visibility="Hidden">
+                    <!-- Отображение прогресса проферки файлов в выбранной папке и во всех вложенных в нее папках -->
+                    <StackPanel Margin="5 0 5 0" Orientation="Horizontal" HorizontalAlignment="Right">
+                        <TextBlock Text="Проверено "/>
+                        <TextBlock Text="{Binding Progress}"/>
+                        <TextBlock Text=" из "/>
+                        <TextBlock Text="{Binding InFolder}"/>
+                    </StackPanel>
+                </StackPanel>
+            </DockPanel>
+        </Grid>
+    </Grid>
+</Window>
